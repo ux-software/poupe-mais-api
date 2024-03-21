@@ -6,7 +6,7 @@
 
 ## Visão Geral
 
-Poupe+ é uma plataforma projetada para o gerenciamento de gastos pessoais.
+Poupe+ é uma plataforma projetada para o gerenciamento de despesas pessoais.
 
 ## Instalação
 
