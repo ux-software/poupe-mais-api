@@ -1,7 +1,7 @@
 # Zap Ágil
 
 ![NestJS](https://img.shields.io/badge/NestJs-%23E0234E.svg?style=flat&logo=nestjs&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-%23589636.svg?style=flat&logo=postgresql&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-%233A618B.svg?style=flat&logo=postgresql&logoColor=white)
 ![Typescript](https://img.shields.io/badge/Typescript-%234166CA.svg?style=flat&logo=mongodb&logoColor=white)
 
 ## Visão Geral
