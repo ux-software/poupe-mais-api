@@ -18,9 +18,8 @@ model User {
   username      String @unique
   monthlyIncome Float
 
-  categories      Category[]
-  monthlyExpenses    MonthlyExpense[]
-  monthlyIncomes    MonthlyIncome[]
+  categories   Category[]
+  transactions Transaction[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -29,11 +28,11 @@ model User {
 }
 
 model Category {
-  id            String @id @default(uuid())
-  categoryName  String @unique
+  id           String @id @default(uuid())
+  categoryName String @unique
 
-  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId   String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -41,30 +40,22 @@ model Category {
   @@map("categories")
 }
 
-model MonthlyExpense {
-  id          String         @id @default(uuid())
-  value       String
-  description String
+model Transaction {
+  id          String          @id @default(uuid())
+  value       Float
+  description String?
+  type        TransactionType
 
-  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId   String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("monthly_expenses")
+  @@map("monthly_transactions")
 }
 
-model MonthlyIncome {
-  id          String         @id @default(uuid())
-  value       String
-  description String
-
-  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId   String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("monthly_incomes")
+enum TransactionType {
+  EXPENSE
+  INCOME
 }
