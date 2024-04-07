@@ -17,7 +17,7 @@ export class SignInInput {
   username!: string;
 
   @IsString({ message: 'Username inválido' })
-  @IsNotEmpty({ message: 'Username é obrigatório' })
+  @IsNotEmpty({ message: 'Email é obrigatório' })
   email!: string;
 }
 
