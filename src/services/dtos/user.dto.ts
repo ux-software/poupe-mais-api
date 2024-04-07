@@ -16,8 +16,9 @@ export class SignInInput {
   @IsNotEmpty({ message: 'Username é obrigatório' })
   username!: string;
 
-  @IsNumber({}, { message: 'Receita mensal inválida' })
-  monthlyIncome?: number;
+  @IsString({ message: 'Username inválido' })
+  @IsNotEmpty({ message: 'Username é obrigatório' })
+  email!: string;
 }
 
 export type SignInOutput = User & {

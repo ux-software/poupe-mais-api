@@ -1,13 +1,12 @@
 import { PrismaService } from '@/database/prisma';
 import {
   BadRequestException,
-  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { Transaction } from '@prisma/client';
 
-import { CreateTransactionInput } from './dtos';
+import { CreateTransactionInput, DeleteCategoryInput } from './dtos';
 
 @Injectable()
 export class TransactionService {
@@ -34,11 +33,12 @@ export class TransactionService {
         description: input.description,
         type: input.type,
         userId: user.id,
+        categoryId: input.categoryId,
       },
     });
   }
 
-  async list(userId: string): Promise<Category[]> {
+  async list(userId: string): Promise<Transaction[]> {
     const user = await this.prismaService.user.findUnique({
       where: {
         id: userId,
@@ -49,7 +49,7 @@ export class TransactionService {
       throw new NotFoundException('Usuário não encontrado');
     }
 
-    return await this.prismaService.category.findMany({
+    return await this.prismaService.transaction.findMany({
       where: {
         userId,
       },

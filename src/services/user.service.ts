@@ -5,10 +5,10 @@ import {
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 
-import { PrismaService } from '@/database/prisma';
-import { SignInInput, SignInOutput } from './dtos';
-import { AuthService } from './auth.service';
 import { DEFAULT_CATEGORIES } from '@/constants';
+import { PrismaService } from '@/database/prisma';
+import { AuthService } from './auth.service';
+import { SignInInput, SignInOutput } from './dtos';
 
 @Injectable()
 export class UserService {
@@ -46,23 +46,26 @@ export class UserService {
   }
 
   async signIn(input: SignInInput): Promise<SignInOutput> {
-    const { username, monthlyIncome } = input;
+    const { username, email } = input;
     const usernameRegex = /^[a-zA-Z0-9]+$/;
     const isValidUsername = usernameRegex.test(username);
     if (!isValidUsername) {
       throw new UnprocessableEntityException('Username inválido');
     }
 
-    if (monthlyIncome) {
-      const isValidMonthlyIncome = monthlyIncome >= 0;
-      if (!isValidMonthlyIncome) {
-        throw new UnprocessableEntityException('Receita mensal inválida');
-      }
-    }
+    const monthlyIncome = 1000;
+
+    // if (monthlyIncome) {
+    //   const isValidMonthlyIncome = monthlyIncome >= 0;
+    //   if (!isValidMonthlyIncome) {
+    //     throw new UnprocessableEntityException('Receita mensal inválida');
+    //   }
+    // }
 
     const user = await this.prismaService.user.findUnique({
       where: {
         username,
+        email,
       },
     });
 
@@ -84,6 +87,7 @@ export class UserService {
     const newUser = await this.prismaService.user.create({
       data: {
         username,
+        email,
         monthlyIncome,
       },
     });

@@ -19,6 +19,7 @@ export const getConfig = (): Config => {
   });
 
   const envResult = envSchema.safeParse(process.env);
+
   if (!envResult.success) {
     envLogger.error('Invalid environment variables', 'Environment');
     process.exit(1);
