@@ -62,6 +62,12 @@ export class UserService {
       },
     });
 
+    if (!user) {
+      throw new UnprocessableEntityException(
+        'Username ou Email já cadastrado!',
+      );
+    }
+
     if (user) {
       return {
         ...user,
