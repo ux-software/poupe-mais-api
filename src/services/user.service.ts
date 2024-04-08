@@ -31,8 +31,8 @@ export class UserService {
     return user;
   }
 
-  async findByUsername(username: string): Promise<User> {
-    const user = await this.prismaService.user.findUnique({
+  async findByUsername(username: string): Promise<User[]> {
+    const user = await this.prismaService.user.findMany({
       where: {
         username,
       },
@@ -62,11 +62,11 @@ export class UserService {
       },
     });
 
-    if (!user) {
-      throw new UnprocessableEntityException(
-        'Username ou Email já cadastrado!',
-      );
-    }
+    const emailExists = await this.prismaService.user.findFirst({
+      where: {
+        email: email,
+      },
+    });
 
     if (user) {
       return {
@@ -76,6 +76,12 @@ export class UserService {
           username: user.username,
         }),
       };
+    }
+
+    if (emailExists) {
+      throw new UnprocessableEntityException(
+        'Username ou Email já cadastrado!',
+      );
     }
 
     // NOTE: se o usuário não existir, deve-se criar outro e adicionar as categorias padrões
