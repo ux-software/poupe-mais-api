@@ -1,5 +1,5 @@
-import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
   NestFastifyApplication,
@@ -19,6 +19,11 @@ async function bootstrap() {
       errorHttpStatusCode: 422,
     }),
   );
+
+  app.enableCors({
+    origin: '*',
+  });
+
   await app.listen(3000, '0.0.0.0');
 }
 bootstrap();

@@ -16,6 +16,8 @@ datasource db {
 model User {
   id            String @id @default(uuid())
   username      String @unique
+  email         String @unique
+
   monthlyIncome Float
 
   categories   Category[]
@@ -30,6 +32,7 @@ model User {
 model Category {
   id           String @id @default(uuid())
   categoryName String @unique
+  transaction Transaction[]
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
@@ -48,6 +51,9 @@ model Transaction {
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
+
+  category Category? @relation(fields: [categoryId], references: [id])
+  categoryId   String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

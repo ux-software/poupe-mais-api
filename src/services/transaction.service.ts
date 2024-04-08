@@ -1,13 +1,12 @@
 import { PrismaService } from '@/database/prisma';
 import {
   BadRequestException,
-  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { Transaction } from '@prisma/client';
 
-import { CreateTransactionInput } from './dtos';
+import { CreateTransactionInput, DeleteTransactionInput } from './dtos';
 
 @Injectable()
 export class TransactionService {
@@ -34,11 +33,12 @@ export class TransactionService {
         description: input.description,
         type: input.type,
         userId: user.id,
+        categoryId: input.categoryId,
       },
     });
   }
 
-  async list(userId: string): Promise<Category[]> {
+  async list(userId: string): Promise<Transaction[]> {
     const user = await this.prismaService.user.findUnique({
       where: {
         id: userId,
@@ -49,23 +49,26 @@ export class TransactionService {
       throw new NotFoundException('Usuário não encontrado');
     }
 
-    return await this.prismaService.category.findMany({
+    return await this.prismaService.transaction.findMany({
       where: {
         userId,
+      },
+      include: {
+        category: true,
       },
     });
   }
 
-  async delete(input: DeleteCategoryInput): Promise<void> {
-    const [user, category] = await Promise.all([
+  async delete(input: DeleteTransactionInput): Promise<void> {
+    const [user, transaction] = await Promise.all([
       this.prismaService.user.findUnique({
         where: {
           id: input.userId,
         },
       }),
-      this.prismaService.category.findUnique({
+      this.prismaService.transaction.findUnique({
         where: {
-          id: input.categoryId,
+          id: input.transactionId,
         },
       }),
     ]);
@@ -74,13 +77,13 @@ export class TransactionService {
       throw new NotFoundException('Usuário não encontrado');
     }
 
-    if (!category) {
-      throw new NotFoundException('Categoria não encontrada');
+    if (!transaction) {
+      throw new NotFoundException('Transação não encontrada');
     }
 
-    await this.prismaService.category.delete({
+    await this.prismaService.transaction.delete({
       where: {
-        id: category.id,
+        id: transaction.id,
         userId: user.id,
       },
     });
