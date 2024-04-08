@@ -27,6 +27,13 @@ export class TransactionService {
       throw new NotFoundException('Usuário não encontrado');
     }
 
+    if (input.type === 'INCOME' && input.categoryId) {
+      throw new BadRequestException('Ganho não precisa de uma categoria');
+    }
+    if (input.type === 'EXPENSE' && !input.categoryId) {
+      throw new BadRequestException('Despesa precisa de uma categoria');
+    }
+
     return await this.prismaService.transaction.create({
       data: {
         value: input.value,
