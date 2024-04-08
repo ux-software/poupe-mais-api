@@ -46,13 +46,8 @@ export class CreateTransactionBody {
   })
   type!: (typeof TRANSACTION_TYPE)[number];
 
+  @ValidateIf((_: { type: 'EXPENSE' | 'INCOME' }) => _.type !== 'INCOME')
   @IsUUID('4', { message: 'Id da categoria inválida' })
-  @ValidateIf((_: { type: 'EXPENSE' | 'INCOME' }) => {
-    if (_.type === 'INCOME') {
-      return false;
-    }
-    return true;
-  })
   categoryId?: string | null;
 }
 
