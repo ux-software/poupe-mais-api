@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Post,
   Req,
@@ -10,14 +11,17 @@ import { validate } from 'class-validator';
 import { FastifyRequest } from 'fastify';
 
 import { TransactionService } from '@/services';
-import { CreateTransactionInput } from '@/services/dtos';
+import { CreateTransactionBody, CreateTransactionInput } from '@/services/dtos';
 
 @Controller('transaction')
 export class TransactionController {
   constructor(private transactionService: TransactionService) {}
 
   @Post()
-  async create(@Req() request: FastifyRequest, @Body() body: any) {
+  async create(
+    @Req() request: FastifyRequest,
+    @Body() body: CreateTransactionBody,
+  ) {
     const userId = request.user?.id;
     if (!userId) {
       throw new UnauthorizedException('Não autenticado');
@@ -28,6 +32,7 @@ export class TransactionController {
     input.description = body.description;
     input.type = body.type;
     input.value = body.value;
+    input.categoryId = body.categoryId;
     await validate(input);
 
     const output = await this.transactionService.create(input);
@@ -46,6 +51,26 @@ export class TransactionController {
     }
 
     const output = await this.transactionService.list(userId);
+
+    return {
+      statusCode: 200,
+      body: output,
+    };
+  }
+
+  @Delete(':id')
+  async delete(@Req() request: FastifyRequest) {
+    const userId = request.user?.id;
+    const { id } = request.params as { id: string };
+
+    if (!userId) {
+      throw new UnauthorizedException('Não autenticado');
+    }
+
+    const output = await this.transactionService.delete({
+      userId: userId,
+      transactionId: id,
+    });
 
     return {
       statusCode: 200,
