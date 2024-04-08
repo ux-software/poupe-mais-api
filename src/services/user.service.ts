@@ -55,13 +55,6 @@ export class UserService {
 
     const monthlyIncome = 1000;
 
-    // if (monthlyIncome) {
-    //   const isValidMonthlyIncome = monthlyIncome >= 0;
-    //   if (!isValidMonthlyIncome) {
-    //     throw new UnprocessableEntityException('Receita mensal inválida');
-    //   }
-    // }
-
     const user = await this.prismaService.user.findUnique({
       where: {
         username,
@@ -97,7 +90,7 @@ export class UserService {
         categoryName,
         userId: newUser.id,
       })),
-      skipDuplicates: true,
+      skipDuplicates: false,
     });
 
     return {
