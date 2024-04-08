@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Transaction } from '@prisma/client';
 
-import { CreateTransactionInput, DeleteCategoryInput } from './dtos';
+import { CreateTransactionInput, DeleteTransactionInput } from './dtos';
 
 @Injectable()
 export class TransactionService {
@@ -53,19 +53,22 @@ export class TransactionService {
       where: {
         userId,
       },
+      include: {
+        category: true,
+      },
     });
   }
 
-  async delete(input: DeleteCategoryInput): Promise<void> {
-    const [user, category] = await Promise.all([
+  async delete(input: DeleteTransactionInput): Promise<void> {
+    const [user, transaction] = await Promise.all([
       this.prismaService.user.findUnique({
         where: {
           id: input.userId,
         },
       }),
-      this.prismaService.category.findUnique({
+      this.prismaService.transaction.findUnique({
         where: {
-          id: input.categoryId,
+          id: input.transactionId,
         },
       }),
     ]);
@@ -74,13 +77,13 @@ export class TransactionService {
       throw new NotFoundException('Usuário não encontrado');
     }
 
-    if (!category) {
-      throw new NotFoundException('Categoria não encontrada');
+    if (!transaction) {
+      throw new NotFoundException('Transação não encontrada');
     }
 
-    await this.prismaService.category.delete({
+    await this.prismaService.transaction.delete({
       where: {
-        id: category.id,
+        id: transaction.id,
         userId: user.id,
       },
     });
