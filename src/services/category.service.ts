@@ -6,7 +6,11 @@ import {
 } from '@nestjs/common';
 import { Category } from '@prisma/client';
 
-import { CreateCategoryInput, DeleteCategoryInput } from './dtos';
+import { 
+  CreateCategoryInput, 
+  UpdateCategoryInput,
+  DeleteCategoryInput
+} from './dtos';
 
 @Injectable()
 export class CategoryService {
@@ -62,7 +66,54 @@ export class CategoryService {
     });
   }
 
-  async delete(input: DeleteCategoryInput): Promise<void> {
+  async update(
+    categoryId: string,
+    input: UpdateCategoryInput,
+  ): Promise<Category> {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id: input.userId,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    const category = await this.prismaService.category.findFirst({
+      where: { id: categoryId },
+    });
+
+    if (!category) {
+      throw new NotFoundException('Categoria não existe');
+    }
+
+    if (input?.categoryName) {
+      const categoryExists = await this.prismaService.category.findFirst({
+        where: {
+          categoryName: {
+            equals: input.categoryName,
+            mode: 'insensitive',
+          },
+        },
+      });
+  
+      if (categoryExists) {
+        throw new ConflictException('Categoria já existe');
+      }
+
+      const newCategoryName = input.categoryName;
+      category.categoryName = newCategoryName;
+      category.updatedAt = new Date();
+    }
+
+    return await this.prismaService.category.update({
+      where: { id: category.id },
+      data: category,
+    });
+  }
+
+  async delete(categoryId: string, input: DeleteCategoryInput): Promise<void> {
     const [user, category] = await Promise.all([
       this.prismaService.user.findUnique({
         where: {
@@ -71,7 +122,7 @@ export class CategoryService {
       }),
       this.prismaService.category.findUnique({
         where: {
-          id: input.categoryId,
+          id: categoryId,
         },
       }),
     ]);

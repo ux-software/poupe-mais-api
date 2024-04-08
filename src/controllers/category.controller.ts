@@ -1,8 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
+  Put,
   Req,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -10,7 +13,7 @@ import { FastifyRequest } from 'fastify';
 import { validate } from 'class-validator';
 
 import { CategoryService } from '@/services';
-import { CreateCategoryInput } from '@/services/dtos';
+import { CreateCategoryInput, DeleteCategoryInput, UpdateCategoryInput } from '@/services/dtos';
 
 @Controller('category')
 export class CategoryController {
@@ -48,6 +51,51 @@ export class CategoryController {
     return {
       statusCode: 200,
       body: output,
+    };
+  }
+
+  @Put(':categoryId')
+  async update(
+    @Param('categoryId') id: string,
+    @Req() request: FastifyRequest, 
+    @Body() body: any,
+  ) {
+    const userId = request.user?.id;
+    if (!userId) {
+      throw new UnauthorizedException('Não autenticado');
+    }
+
+    const input = new UpdateCategoryInput();
+    input.userId = userId;
+    input.categoryName = body.categoryName;
+    await validate(input);
+
+    const output = await this.categoryService.update(id, input);
+
+    return {
+      statusCode: 201,
+      body: output,
+    };
+  }
+
+  @Delete(':categoryId')
+  async delete(
+    @Param('categoryId') id: string,
+    @Req() request: FastifyRequest, 
+  ) {
+    const userId = request.user?.id;
+    if (!userId) {
+      throw new UnauthorizedException('Não autenticado');
+    }
+
+    const input = new DeleteCategoryInput();
+    input.userId = userId;
+    await validate(input);
+
+    await this.categoryService.delete(id, input);
+
+    return {
+      statusCode: 201,
     };
   }
 }
