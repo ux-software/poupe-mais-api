@@ -1,6 +1,7 @@
 import {
   IsIn,
   IsNotEmpty,
+  IsNumber,
   IsString,
   IsUUID,
   ValidateIf,
@@ -32,7 +33,7 @@ export class CreateTransactionInput {
 }
 
 export class CreateTransactionBody {
-  // @IsNumber({ message: 'Valor da transação inválido' })
+  @IsNumber({}, { message: 'Valor da transação inválido' })
   @IsNotEmpty({ message: 'Valor da transação é obrigatório' })
   value!: number;
 
@@ -47,7 +48,7 @@ export class CreateTransactionBody {
 
   @IsUUID('4', { message: 'Id da categoria inválida' })
   @ValidateIf((_: { type: 'EXPENSE' | 'INCOME' }) => {
-    if (_.type === 'EXPENSE') {
+    if (_.type === 'INCOME') {
       return false;
     }
     return true;
