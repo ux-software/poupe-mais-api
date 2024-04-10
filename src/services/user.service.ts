@@ -8,7 +8,7 @@ import { User } from '@prisma/client';
 import { DEFAULT_CATEGORIES } from '@/constants';
 import { PrismaService } from '@/database/prisma';
 import { AuthService } from './auth.service';
-import { SignInInput, SignInOutput } from './dtos';
+import { SignInInput, SignInOutput, UpdateUserInput } from './dtos';
 
 @Injectable()
 export class UserService {
@@ -112,5 +112,56 @@ export class UserService {
         username: newUser.username,
       }),
     };
+  }
+
+  async update(input: UpdateUserInput): Promise<User> {
+    const { userId, username, email, monthlyIncome } = input;
+
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    if (username) {
+      const usernameRegex = /^[a-zA-Z0-9]+$/;
+      const isValidUsername = usernameRegex.test(username);
+      if (!isValidUsername) {
+        throw new UnprocessableEntityException('Username inválido');
+      }
+
+      user.username = username;
+    }    
+
+    if (email) {
+      const emailExists = await this.prismaService.user.findFirst({
+        where: {
+          email: email,
+        },
+      });
+
+      if (emailExists) {
+        throw new UnprocessableEntityException(
+          'Username ou Email já cadastrado!',
+        );
+      }
+
+      user.email = email;
+    }
+
+    if (monthlyIncome) {
+      user.monthlyIncome = monthlyIncome;
+    }
+
+    user.updatedAt = new Date();
+
+    return await this.prismaService.user.update({
+      where: { id: user.id },
+      data: user,
+    });
   }
 }
